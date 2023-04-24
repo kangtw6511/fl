@@ -53,35 +53,35 @@ echo "${TIMEZONE}" > /mnt/gentoo/etc/timezone
 
 # Set up the locale
 echo "en_US ISO-8859-1
-en_US.UTF-8 UTF-8" > /mnt/gentoo/etc/locale.gen
+en_US.UTF-8 UTF-8
+ko_KR.UTF-8 UTF-8" > /mnt/gentoo/etc/locale.gen
 chroot /mnt/gentoo locale-gen
 
 # Set the root password
 chroot /mnt/gentoo passwd
 
 # Configure the network
-echo "config_eth0="dhcp"" > /mnt/gentoo/etc/conf.d/net
+echo "config_eth0=\"dhcp\"" > /mnt/gentoo/etc/conf.d/net
 ln -sf /etc/init.d/net.lo /mnt/gentoo/etc/init.d/net.eth0
-chroot /mnt/gentoo rc-update add net.eth0 default
+rc-update add net.eth0 default
 
-#Set the hostname
-echo "hostname="funtoo"" > /mnt/gentoo/etc/conf.d/hostname
+# Install Korean input method and fonts
+chroot /mnt/gentoo emerge -q app-i18n/ibus-hangul media-fonts/nanum
 
-#Set up the hosts file
-echo "127.0.0.1 localhost funtoo" > /mnt/gentoo/etc/hosts
+# Set up IBus for Korean input
+echo 'GTK_IM_MODULE="ibus"' >> /mnt/gentoo/etc/portage/make.conf
+echo 'QT_IM_MODULE="ibus"' >> /mnt/gentoo/etc/portage/make.conf
+echo 'XMODIFIERS="@im=ibus"' >> /mnt/gentoo/etc/environment
+echo 'export XMODIFIERS' >> /mnt/gentoo/etc/env.d/90xinput
 
-#Set up the timezone
-TIMEZONE="Asia/Seoul"
-ln -sf /usr/share/zoneinfo/${TIMEZONE} /mnt/gentoo/etc/localtime
-echo "${TIMEZONE}" > /mnt/gentoo/etc/timezone
+# Set up locale settings for Korean
+echo 'LANG="ko_KR.UTF-8"' > /mnt/gentoo/etc/env.d/02locale
+echo 'LC_COLLATE="C"' >> /mnt/gentoo/etc/env.d/02locale
+echo 'LC_CTYPE="ko_KR.UTF-8"' >> /mnt/gentoo/etc/env.d/02locale
 
-#Set up the locale
-echo "en_US ISO-8859-1
-en_US.UTF-8 UTF-8" > /mnt/gentoo/etc/locale.gen
-chroot /mnt/gentoo locale-gen
-
-#Set the root password
-chroot /mnt/gentoo passwd
+# Set up console font and keymap for Korean
+echo 'FONT="lat0-16.psfu.gz"' > /mnt/gentoo/etc/env.d/01console
+echo 'KEYMAP="ko"' >> /mnt/gentoo/etc/env.d/01console
 
 #Unmount partitions and reboot
 umount -R /mnt/gentoo
